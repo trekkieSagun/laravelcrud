@@ -33,8 +33,8 @@ Route::post('login', [AuthController::class, 'login']);
 // Route::get("data", [dummyAPI::class, 'getData']);
 
 
-Route::get("getPublishedBlog", [BlogController::class, 'getPublishedBlog']);
-
+Route::get("/get-published-blog", [BlogController::class, 'getPublishedBlog']);
+Route::post("/like", [BlogController::class, 'like']);
 
 // blog publish
 

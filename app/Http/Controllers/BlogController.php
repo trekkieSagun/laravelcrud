@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\BaseController as BaseController;
 use Illuminate\Http\Request;
 use App\Models\Blog;
+use App\Models\Like;
+use Illuminate\Support\Facades\Auth;
+
 
 
 class BlogController extends BaseController
@@ -110,5 +113,27 @@ class BlogController extends BaseController
         $data = Blog::where('published', '1')->get();
 
         return $this->sendResponse($data, "data");
+    }
+
+    public function like(Request $req){
+       
+        $userCheck = Like::where('blog_id', $req->blog_id)->where('user_id', $req->user_id)->first();
+        
+        
+        if($userCheck){
+            $userCheck->like = !$userCheck->like;
+
+            $userCheck->save();
+            return $this->sendResponse($userCheck,"Like updated");
+
+        }
+        $like = new Like();
+        $like->blog_id = $req->blog_id;
+        $like->user_id = $req->user_id;
+        $like->like = 1;
+
+        $like->save();
+
+        return $this->sendResponse($like, "Liked");
     }
 }

@@ -25,7 +25,7 @@ class AuthController extends BaseController
     }
 
     public function login(Request $req)
-    { {
+    {
             if (Auth::attempt(['email' => $req->email, 'password' => $req->password])) {
                 $user = Auth::user();
                 $success['token'] =  $user->createtoken('MyApp')->accessToken;
@@ -36,5 +36,5 @@ class AuthController extends BaseController
                 return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
             }
         }
-    }
+    
 }
