@@ -23,6 +23,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put("update/{id}", [BlogController::class, 'update']);
     Route::delete("delete/{id}", [BlogController::class, 'delete']);
     Route::get("getData/{id?}", [BlogController::class, 'getData']);
+    Route::post("/like", [BlogController::class, 'like']);
 });
 
 
@@ -34,8 +35,11 @@ Route::post('login', [AuthController::class, 'login']);
 
 
 Route::get("/get-published-blog", [BlogController::class, 'getPublishedBlog']);
-Route::post("/like", [BlogController::class, 'like']);
 
 // blog publish
 
 Route::put("publishBlog/{id}", [BlogController::class, "publishBlog"]);
+
+//total likes
+
+Route::post("/totalLikes", [BlogController::class, 'totalLikes']);

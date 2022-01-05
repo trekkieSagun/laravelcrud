@@ -7,27 +7,27 @@ use Illuminate\Http\Request;
 use App\Models\Blog;
 use App\Models\Like;
 use Illuminate\Support\Facades\Auth;
-
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 
 class BlogController extends BaseController
 {
     function addData(Request $req)
     {
+        $randomString = Str::random(10);
+
+        $newImageName = time() . '-' . $randomString . '.' . $req->image->extension();
+
+        $req->image->move(public_path('images'), $newImageName);
+
 
         $blog  = new Blog;
         $blog->title = $req->title;
         $blog->description = $req->description;
         $blog->likes = $req->likes;
-        $blog->image = $req->image;
-        dd($req);
+        $blog->image = $newImageName;
 
-        if ($image = $req->file('image')) {
-            $destinationPath = 'image/';
-            $blogImage = date('YmdHis') . "." . $image->getClientOriginalExtension();
-            $image->move($destinationPath, $blogImage);
-            $input['image'] = "$blogImage";
-        }
 
         $result = $blog->save();
 
@@ -56,12 +56,25 @@ class BlogController extends BaseController
     {
         $blog = Blog::find($id);
 
+
         if ($blog) {
             $blog->title = $req->title;
             $blog->description = $req->description;
             $blog->likes = $req->likes;
 
+            if ($req->hasFile('image')) {
+                $imageCheck = public_path('images') . $blog->image;
+
+                if (File::exists($imageCheck)) {
+                    File::delete($imageCheck);
+                }
+            }
+            $blog->image = $req->image;
+
+
             $result = $blog->save();
+
+            dd($result);
 
             if ($result) {
 
@@ -115,25 +128,40 @@ class BlogController extends BaseController
         return $this->sendResponse($data, "data");
     }
 
-    public function like(Request $req){
-       
-        $userCheck = Like::where('blog_id', $req->blog_id)->where('user_id', $req->user_id)->first();
-        
-        
-        if($userCheck){
+    public function like(Request $req)
+    {
+        $logged_in_user_id = Auth::id();
+
+
+        $userCheck = Like::where('blog_id', $req->blog_id)->where('user_id', $logged_in_user_id)->first();
+
+
+        if ($userCheck) {
             $userCheck->like = !$userCheck->like;
 
             $userCheck->save();
-            return $this->sendResponse($userCheck,"Like updated");
-
+            return $this->sendResponse($userCheck, "Like updated");
         }
         $like = new Like();
         $like->blog_id = $req->blog_id;
-        $like->user_id = $req->user_id;
+        $like->user_id =  $logged_in_user_id;
         $like->like = 1;
 
         $like->save();
 
         return $this->sendResponse($like, "Liked");
+    }
+
+
+    public function totalLikes(Request $req)
+    {
+
+        $incommingBlogId = $req->blog_id;
+
+        dd($incommingBlogId);
+        $totalLikes = Like::where('blog_id', $req->$incommingBlogId)->where('like', 1)->first();
+
+        $count = $totalLikes->count();
+        dd($count);
     }
 }
