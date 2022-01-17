@@ -56,6 +56,7 @@ class BlogController extends BaseController
     {
         $blog = Blog::find($id);
 
+        dd($req->title);
 
         if ($blog) {
             $blog->title = $req->title;
