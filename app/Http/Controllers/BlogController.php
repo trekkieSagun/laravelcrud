@@ -25,7 +25,7 @@ class BlogController extends BaseController
         $blog  = new Blog;
         $blog->title = $req->title;
         $blog->description = $req->description;
-        $blog->likes = $req->likes;
+
         $blog->image = $newImageName;
 
 
@@ -45,37 +45,44 @@ class BlogController extends BaseController
         $data = $id ? Blog::find($id) : Blog::all();
 
         if ($data) {
-            // return $data;
+            foreach ($data as $blog) {
+                $totalLikes = Like::where('blog_id', $blog->id)->where('like', '1')->get();
+                $count = count($totalLikes);
+                $blog['totalLikes'] = $count;
+            }
             return $this->sendResponse($data, "data");
         }
         return $this->sendError("No data found for id = $id");
     }
 
 
-    function update($id, Request $req)
+    function update(Request $req, $id)
     {
         $blog = Blog::find($id);
 
-        dd($req->title);
-
         if ($blog) {
             $blog->title = $req->title;
+
             $blog->description = $req->description;
-            $blog->likes = $req->likes;
+
 
             if ($req->hasFile('image')) {
-                $imageCheck = public_path('images') . $blog->image;
+                $imageCheck = 'images/' . $blog->image;
+
 
                 if (File::exists($imageCheck)) {
                     File::delete($imageCheck);
                 }
+
+                $randomString = Str::random(10);
+                $newImageName = time() . '-' . $randomString . '.' . $req->image->extension();
+
+                $req->image->move(public_path('images'), $newImageName);
+
+                $blog->image = $newImageName;
             }
-            $blog->image = $req->image;
 
-
-            $result = $blog->save();
-
-            dd($result);
+            $result = $blog->update();
 
             if ($result) {
 
@@ -106,6 +113,7 @@ class BlogController extends BaseController
     function publishBlog($id)
     {
         $blog = Blog::find($id);
+
         if ($blog) {
             $blog->published = !$blog->published;
 
@@ -125,6 +133,14 @@ class BlogController extends BaseController
     function getPublishedBlog()
     {
         $data = Blog::where('published', '1')->get();
+
+        foreach ($data as $blog) {
+            $totalLikes = Like::where('blog_id', $blog->id)->where('like', '1')->get();
+            $count = count($totalLikes);
+            $blog['totalLikes'] = $count;
+        }
+
+        // $data = $blog;
 
         return $this->sendResponse($data, "data");
     }
@@ -146,23 +162,10 @@ class BlogController extends BaseController
         $like = new Like();
         $like->blog_id = $req->blog_id;
         $like->user_id =  $logged_in_user_id;
-        $like->like = 1;
+        $like->like = true;
 
         $like->save();
 
         return $this->sendResponse($like, "Liked");
-    }
-
-
-    public function totalLikes(Request $req)
-    {
-
-        $incommingBlogId = $req->blog_id;
-
-        dd($incommingBlogId);
-        $totalLikes = Like::where('blog_id', $req->$incommingBlogId)->where('like', 1)->first();
-
-        $count = $totalLikes->count();
-        dd($count);
     }
 }

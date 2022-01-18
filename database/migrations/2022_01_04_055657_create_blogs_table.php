@@ -17,7 +17,6 @@ class CreateBlogsTable extends Migration
             $table->id();
             $table->string('title');
             $table->string('description');
-            $table->integer('likes');
             $table->string('published');
             $table->string('image');
 
