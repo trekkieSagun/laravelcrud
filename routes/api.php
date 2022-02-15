@@ -31,7 +31,6 @@ Route::middleware('auth:api')->group(function () {
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
-// Route::get("data", [dummyAPI::class, 'getData']);
 
 
 Route::get("/get-published-blog", [BlogController::class, 'getPublishedBlog']);
