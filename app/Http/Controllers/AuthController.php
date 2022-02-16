@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
-class AuthController extends BaseController
+class   AuthController extends BaseController
 {
 
     public function register(Request $req)
@@ -49,7 +49,7 @@ class AuthController extends BaseController
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {
-            return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
+            return $this->sendError('error.', ['error' => 'Invalid email or password']);
         }
     }
 }

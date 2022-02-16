@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\AuthController;
-
+use App\Http\Controllers\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +17,11 @@ use App\Http\Controllers\AuthController;
 |
 */
 
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
+
+
+
 Route::middleware('auth:api')->group(function () {
     // return $request->user();
     Route::post("addData", [BlogController::class, 'addData']);
@@ -24,12 +29,12 @@ Route::middleware('auth:api')->group(function () {
     Route::delete("delete/{id}", [BlogController::class, 'delete']);
     Route::get("getData/{id?}", [BlogController::class, 'getData']);
     Route::post("/like", [BlogController::class, 'like']);
+    Route::get("/getUsers", [UserController::class, 'getUsers']);
 });
 
 
 
-Route::post('register', [AuthController::class, 'register']);
-Route::post('login', [AuthController::class, 'login']);
+
 
 
 
